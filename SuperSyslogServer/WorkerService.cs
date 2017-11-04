@@ -53,11 +53,11 @@ namespace SuperSyslogServer
 
                 messagesToStore.Add(syslog);
             }
-            if (messagesToStore.Count > 0)
-                Logger.Info($"Removed {messagesToStore.Count} Syslogs from buffer. Buffer Length: {_syslogQueue.Count}");
 
-            DataContext.Syslog.AddRange(messagesToStore);
-            DataContext.SaveChanges();
+            if (messagesToStore.Count <= 0) return;
+
+            Logger.Info($"Removed {messagesToStore.Count} Syslogs from buffer. Buffer Length: {_syslogQueue.Count}");
+            DataContext.BulkInsert(messagesToStore);
         }
 
         internal void UdpListener()
