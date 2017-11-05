@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -31,7 +32,7 @@ namespace SuperSyslogServer
         internal void ElapsedHandler(object sender, EventArgs e)
         {
             UpdateMessagesPerSecond();
-            StoreSyslogMessages(500);
+            StoreSyslogMessages(2500);
         }
 
         private void UpdateMessagesPerSecond()
@@ -41,23 +42,28 @@ namespace SuperSyslogServer
             MessagesPerSecond = 0;
         }
 
-        private void StoreSyslogMessages(int numberOfMessages)
+        private void StoreSyslogMessages(int syslogDequeueCount)
         {
-            var messagesToStore = new List<Syslog>();
+            var syslogBulkInsertList = new List<Syslog>();
 
-            for (var i = 0; i < numberOfMessages; i++)
+            for (var i = 0; i < syslogDequeueCount; i++)
             {
                 _syslogQueue.TryDequeue(out var syslog);
 
                 if (syslog == null) break;
 
-                messagesToStore.Add(syslog);
+                syslog.Expand();
+
+                syslogBulkInsertList.Add(syslog);
             }
 
-            if (messagesToStore.Count <= 0) return;
+            if (syslogBulkInsertList.Count <= 0) return;
 
-            Logger.Info($"Removed {messagesToStore.Count} Syslogs from buffer. Buffer Length: {_syslogQueue.Count}");
-            DataContext.BulkInsert(messagesToStore);
+            var syslogBulkInsertTimer = Stopwatch.StartNew();
+            SqlHelper.BulkInsertSyslog(syslogBulkInsertList);
+            syslogBulkInsertTimer.Stop();
+
+            Logger.Info($"Bulk Inserted {syslogBulkInsertList.Count} Syslog(s) in {syslogBulkInsertTimer.ElapsedMilliseconds}ms. Buffer length: {_syslogQueue.Count}.");
         }
 
         internal void UdpListener()

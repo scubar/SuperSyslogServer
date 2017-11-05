@@ -58,16 +58,14 @@
     <Reference Include="Topshelf.NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b800c4cfcdeea87b, processorArchitecture=MSIL">
       <HintPath>..\packages\Topshelf.NLog.4.0.3\lib\net452\Topshelf.NLog.dll</HintPath>
     </Reference>
-    <Reference Include="Z.EntityFramework.Extensions, Version=3.13.10.0, Culture=neutral, PublicKeyToken=59b66d028979105b, processorArchitecture=MSIL">
-      <HintPath>..\packages\Z.EntityFramework.Extensions.3.13.10\lib\net45\Z.EntityFramework.Extensions.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Data\Syslog.cs" />
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SqlHelper.cs" />
     <Compile Include="SuperSyslogContext.cs" />
-    <Compile Include="SyslogParser.cs" />
     <Compile Include="WorkerService.cs" />
   </ItemGroup>
   <ItemGroup>
