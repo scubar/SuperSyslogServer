@@ -15,9 +15,9 @@ namespace SuperSyslogServer
             HostFactory.Run(x =>
             {
                 // Main Service Configuration
-                x.Service<WorkerService>(sc =>
+                x.Service<Service>(sc =>
                 {
-                    sc.ConstructUsing(name => new WorkerService());
+                    sc.ConstructUsing(name => new Service());
                     sc.WhenStarted(service => service.Start());
                     sc.WhenStopped(service => service.Stop());
                 });
