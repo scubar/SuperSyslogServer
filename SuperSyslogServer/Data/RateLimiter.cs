@@ -4,9 +4,9 @@ using System.Net;
 
 namespace SuperSyslogServer
 {
-    public class Telemetry
+    public class RateLimiter
     {
-        public int GlobalMaxMessagesPerSecond = 1500;
+        public int GlobalMaxMessagesPerSecond = 2000;
         public int SenderMaxMessagesPerSecond = 1000;
         public int GlobalMessagesPerSecond { get; set; }
         public int GlobalAllowedMessagesPerSecond { get; set; }

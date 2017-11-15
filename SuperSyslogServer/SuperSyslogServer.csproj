@@ -68,7 +68,7 @@
     <Compile Include="SuperSyslogContext.cs" />
     <Compile Include="Service.cs" />
     <Compile Include="Data\SyslogSender.cs" />
-    <Compile Include="Data\Telemetry.cs" />
+    <Compile Include="Data\RateLimiter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

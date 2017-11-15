@@ -20,7 +20,7 @@ namespace SuperSyslogServer
         private readonly Timer _workerServiceTimer;
         private readonly Timer _loggingServiceTimer;
         private readonly ConcurrentQueue<Syslog> _syslogQueue = new ConcurrentQueue<Syslog>();
-        private readonly Telemetry _telemetry = new Telemetry();
+        private readonly RateLimiter _rateLimiter = new RateLimiter();
 
         internal Service()
         {
@@ -62,9 +62,9 @@ namespace SuperSyslogServer
 
                             var allowed = false;
 
-                            lock (_telemetry)
+                            lock (_rateLimiter)
                             {
-                               allowed = _telemetry.AllowMessage(ipEndPoint.Address);
+                               allowed = _rateLimiter.AllowMessage(ipEndPoint.Address);
                             }
 
                             if (!allowed) continue;
@@ -89,14 +89,14 @@ namespace SuperSyslogServer
             var allowedMessagesPerSecond = 0;
             SyslogSender topTalker;
 
-            lock (_telemetry)
+            lock (_rateLimiter)
             {
-                if (_telemetry.GlobalMessagesPerSecond <= 0) return;
-                messagesPerSecond = _telemetry.GlobalMessagesPerSecond;
-                allowedMessagesPerSecond = _telemetry.GlobalAllowedMessagesPerSecond;
-                topTalker = _telemetry.SyslogSenders.OrderByDescending(s => s.MessagesPerSecond).First();
+                if (_rateLimiter.GlobalMessagesPerSecond <= 0) return;
+                messagesPerSecond = _rateLimiter.GlobalMessagesPerSecond;
+                allowedMessagesPerSecond = _rateLimiter.GlobalAllowedMessagesPerSecond;
+                topTalker = _rateLimiter.SyslogSenders.OrderByDescending(s => s.MessagesPerSecond).First();
 
-                _telemetry.Reset();
+                _rateLimiter.Reset();
             }
 
             Logger.Debug($"Received/Allowed Messages per Second: {messagesPerSecond}/{allowedMessagesPerSecond} (Top Sender: {topTalker.IPAddress} Received/Allowed Messages per Second: {topTalker.MessagesPerSecond}/{topTalker.AllowedMessagesPerSecond})");
